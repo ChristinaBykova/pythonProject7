@@ -48,19 +48,69 @@
 #     thread2.join()
 #
 #     print('Процессы завершены')
+#
+# def print_name(prefix):
+#     print(f' {prefix}')
+#     try:
+#         while True:
+#             name = (yield)
+#             if prefix in name:
+#                 print(name)
+#     except GeneratorExit:
+#         print('Корутина (coroutine) завершина')
+#
+# corou = print_name('Уважаемый')
+# corou.__next__()
+# corou.send('товарищ')
+# corou.send('Уважаемый товарищ')
+# corou.close()
 
-def print_name(prefix):
-    print(f' {prefix}')
-    try:
-        while True:
-            name = (yield)
-            if prefix in name:
-                print(name)
-    except GeneratorExit:
-        print('Корутина (coroutine) завершина')
+# import signal
+# import sys
+# import json
+# import asyncio
+# import aiohttp
+#
+# loop = asyncio.get_event_loop()
+# client = aiohttp.ClientSession(loop=loop)
+#
+#
+# async def get_json(client, url):
+#     async with client.get(url) as response:
+#         assert response.status == 200
+#         return await response.read()
+#
+#
+# async def get_reddit_top(subredit, client):
+#     url = 'https://www.reddit.com/r/' + subredit + '/top.json?sort=top&t=day&limit=5'
+#     print(url)
+#     data1 = await get_json(client, url)
+#     j = json.loads(data1.decode('utf-8'))
+#     for i in j['data']['children']:
+#         score = i['data']['score']
+#         title = i['data']['title']
+#         link = i['data']['url']
+#         print(str(score) + ': ' + title + ' (' + link + ')')
+#     print('Готово:', subredit + '\n')
+#
+#
+# def signal_handler(signal, frame):
+#     loop.stop()
+#     client.close()
+#     sys.exit(0)
+#
+#
+# signal.signal(signal.SIGINT, signal_handler)
+# asyncio.ensure_future(get_reddit_top('python', client))
+# asyncio.ensure_future(get_reddit_top('programming', client))
+# asyncio.ensure_future(get_reddit_top('compsci', client))
+# loop.run_forever()
 
-corou = print_name('Уважаемый')
-corou.__next__()
-corou.send('товарищ')
-corou.send('Уважаемый товарищ')
-corou.close()
+from lib import count_word_at_url
+from redis import Redis
+from rq import Queue
+
+q = Queue(connection=Redis())
+job = q.enqueue(count_word_at_url, 'http://nvie.com')
+
+
